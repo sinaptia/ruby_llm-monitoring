@@ -36,5 +36,45 @@ module RubyLLM::Monitoring
       get metrics_url
       assert_response :success
     end
+
+    test "displays totals summary cards" do
+      get metrics_url
+      assert_response :success
+
+      # Check that totals section is rendered
+      assert_select ".columns .box", minimum: 3
+      assert_match "Requests", response.body
+      assert_match "Cost", response.body
+      assert_match "Avg Response Time", response.body
+    end
+
+    test "displays provider/model breakdown table" do
+      get metrics_url
+      assert_response :success
+
+      # Check that breakdown table is rendered with provider/model data
+      assert_select "table.table tbody tr", minimum: 1
+    end
+
+    test "totals are correctly calculated for the time range" do
+      # Default time range is 2 hours ago, so gemini_with_cache and anthropic_old should be excluded
+      # Within range: anthropic_recent (30 min ago), ollama_recent (1 hour ago), no_tokens (1 hour ago)
+      get metrics_url
+      assert_response :success
+
+      # anthropic should appear in the breakdown
+      assert_match "anthropic", response.body
+      # ollama should appear in the breakdown
+      assert_match "ollama", response.body
+    end
+
+    test "totals work with empty results" do
+      Event.delete_all
+      get metrics_url
+      assert_response :success
+
+      # Should show 0 requests
+      assert_match "0", response.body
+    end
   end
 end

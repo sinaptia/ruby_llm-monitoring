@@ -1,0 +1,45 @@
+<div class="columns is-multiline mb-5">
+  <div class="column is-4">
+    <div class="box has-text-centered">
+      <p class="heading">Requests</p>
+      <p class="title"><%= number_with_delimiter(@totals[:requests]) %></p>
+    </div>
+  </div>
+  <div class="column is-4">
+    <div class="box has-text-centered">
+      <p class="heading">Cost</p>
+      <p class="title"><%= number_to_currency(@totals[:cost]) %></p>
+    </div>
+  </div>
+  <div class="column is-4">
+    <div class="box has-text-centered">
+      <p class="heading">Avg Response Time</p>
+      <p class="title"><%= @totals[:avg_response_time] ? "#{@totals[:avg_response_time].round(1)}ms" : "N/A" %></p>
+    </div>
+  </div>
+</div>
+
+<% if @totals_by_provider.any? %>
+  <div class="box mb-5">
+    <table class="table is-fullwidth is-striped">
+      <thead>
+        <tr>
+          <th>Provider/Model</th>
+          <th class="has-text-right">Requests</th>
+          <th class="has-text-right">Cost</th>
+          <th class="has-text-right">Avg Response Time</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @totals_by_provider.each do |row| %>
+          <tr>
+            <td><%= row.provider %>/<%= row.model %></td>
+            <td class="has-text-right"><%= number_with_delimiter(row.requests) %></td>
+            <td class="has-text-right"><%= number_to_currency(row.cost || 0) %></td>
+            <td class="has-text-right"><%= row.avg_response_time ? "#{row.avg_response_time.round(1)}ms" : "N/A" %></td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+<% end %>

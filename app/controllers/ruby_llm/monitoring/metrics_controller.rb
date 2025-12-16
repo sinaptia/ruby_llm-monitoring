@@ -12,6 +12,22 @@ module RubyLLM::Monitoring
         build_metric_series(title: "Cost", data: aggregate_metric(@events.sum(:cost)), unit: "money"),
         build_metric_series(title: "Response time", data: aggregate_metric(@events.average(:duration), default_value: 0), unit: "ms")
       ]
+
+      @totals_by_provider = Event.where(created_at: @time_range)
+        .group(:provider, :model)
+        .select(
+          :provider,
+          :model,
+          "COUNT(*) as requests",
+          "SUM(cost) as cost",
+          "AVG(duration) as avg_response_time"
+        ).to_a
+
+      @totals = {
+        requests: @totals_by_provider.sum(&:requests),
+        cost: @totals_by_provider.sum { |r| r.cost.to_f },
+        avg_response_time: @totals_by_provider.any? ? @totals_by_provider.sum { |r| r.avg_response_time.to_f * r.requests } / @totals_by_provider.sum(&:requests) : nil
+      }
     end
 
     private

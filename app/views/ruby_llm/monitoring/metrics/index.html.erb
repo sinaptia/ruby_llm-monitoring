@@ -2,6 +2,8 @@
 
 <%= render "filters", clear_path: metrics_path %>
 
+<%= render "totals" %>
+
 <% @metrics.each do |metric| %>
   <div
     data-controller="chart"
