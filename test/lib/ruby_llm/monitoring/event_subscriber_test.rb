@@ -30,5 +30,23 @@ module RubyLLM::Monitoring
       assert_equal "transaction-123", event.transaction_id
       assert_equal "ollama", event.payload["provider"]
     end
+
+    test "extracts exception from payload" do
+      notification_event = ActiveSupport::Notifications::Event.new(
+        "complete_chat.ruby_llm",
+        Time.current,
+        Time.current + 1.second,
+        "transaction-456",
+        { provider: "ollama", model: "gemma3", exception: [ "StandardError", "Something went wrong" ] }
+      )
+
+      assert_difference "Event.count", 1 do
+        EventSubscriber.new.call(notification_event)
+      end
+
+      event = Event.last
+      assert_equal "StandardError", event.exception_class
+      assert_equal "Something went wrong", event.exception_message
+    end
   end
 end

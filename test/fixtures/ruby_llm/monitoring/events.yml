@@ -64,3 +64,16 @@ no_tokens:
   end: <%= (Time.current + 0.5.seconds).to_f %>
   transaction_id: "txn-no-tokens"
   created_at: <%= 1.hour.ago %>
+
+anthropic_error:
+  name: "complete_chat.ruby_llm"
+  payload: { "provider": "anthropic", "model": "claude-3-5-sonnet-20241022", "input_tokens": 1000, "output_tokens": 500, "exception": ["StandardError", "API rate limit exceeded"] }
+  duration: 1250.5
+  allocations: 5000
+  cpu_time: 800.2
+  gc_time: 50.1
+  idle_time: 400.2
+  time: <%= Time.current.to_f %>
+  end: <%= (Time.current + 1.second).to_f %>
+  transaction_id: "txn-anthropic-error"
+  created_at: <%= 30.minutes.ago %>

@@ -1,20 +1,26 @@
 <div class="columns is-multiline mb-5">
-  <div class="column is-4">
+  <div class="column is-3">
     <div class="box has-text-centered">
       <p class="heading">Requests</p>
       <p class="title"><%= number_with_delimiter(@totals[:requests]) %></p>
     </div>
   </div>
-  <div class="column is-4">
+  <div class="column is-3">
     <div class="box has-text-centered">
       <p class="heading">Cost</p>
       <p class="title"><%= number_to_currency(@totals[:cost]) %></p>
     </div>
   </div>
-  <div class="column is-4">
+  <div class="column is-3">
     <div class="box has-text-centered">
       <p class="heading">Avg Response Time</p>
       <p class="title"><%= @totals[:avg_response_time] ? "#{@totals[:avg_response_time].round(1)}ms" : "N/A" %></p>
+    </div>
+  </div>
+  <div class="column is-3">
+    <div class="box has-text-centered">
+      <p class="heading">Error Rate</p>
+      <p class="title"><%= @totals[:error_rate] %>%</p>
     </div>
   </div>
 </div>

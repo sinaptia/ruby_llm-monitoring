@@ -7,10 +7,21 @@ module RubyLLM::Monitoring
       @events = Event.group(:provider, :model)
         .group_by_minute(:created_at, range: @time_range, n: @resolution.in_minutes.to_i)
 
+      error_count_by_time = @events.where.not(exception_class: nil).size
+
       @metrics = [
         build_metric_series(title: "Throughput", data: aggregate_metric(@events.count)),
         build_metric_series(title: "Cost", data: aggregate_metric(@events.sum(:cost)), unit: "money"),
-        build_metric_series(title: "Response time", data: aggregate_metric(@events.average(:duration), default_value: 0), unit: "ms")
+        build_metric_series(
+          title: "Response time",
+          data: aggregate_metric(@events.average(:duration), default_value: 0),
+          unit: "ms"
+        ),
+        build_metric_series(
+          title: "Errors",
+          data: aggregate_metric(error_count_by_time, default_value: 0),
+          unit: "number"
+        )
       ]
 
       @totals_by_provider = Event.where(created_at: @time_range)
@@ -23,10 +34,16 @@ module RubyLLM::Monitoring
           "AVG(duration) as avg_response_time"
         ).to_a
 
+      total_requests = @totals_by_provider.sum(&:requests)
+      error_count = error_count_by_time.values.sum
+
       @totals = {
-        requests: @totals_by_provider.sum(&:requests),
+        requests: total_requests,
         cost: @totals_by_provider.sum { |r| r.cost.to_f },
-        avg_response_time: @totals_by_provider.any? ? @totals_by_provider.sum { |r| r.avg_response_time.to_f * r.requests } / @totals_by_provider.sum(&:requests) : nil
+        avg_response_time: @totals_by_provider.any? ? @totals_by_provider.sum do |r|
+          r.avg_response_time.to_f * r.requests
+        end / total_requests : nil,
+        error_rate: total_requests.positive? ? (error_count.to_f / total_requests * 100).round(1) : 0
       }
     end
 

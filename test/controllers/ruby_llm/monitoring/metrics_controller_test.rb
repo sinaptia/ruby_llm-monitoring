@@ -9,12 +9,13 @@ module RubyLLM::Monitoring
       assert_response :success
     end
 
-    test "renders all three metric charts" do
+    test "renders all four metric charts" do
       get metrics_url
       assert_response :success
       assert_match 'data-title="Throughput"', response.body
       assert_match 'data-title="Cost"', response.body
       assert_match 'data-title="Response time"', response.body
+      assert_match 'data-title="Errors"', response.body
     end
 
     test "filters events by date range" do
@@ -42,10 +43,11 @@ module RubyLLM::Monitoring
       assert_response :success
 
       # Check that totals section is rendered
-      assert_select ".columns .box", minimum: 3
+      assert_select ".columns .box", minimum: 4
       assert_match "Requests", response.body
       assert_match "Cost", response.body
       assert_match "Avg Response Time", response.body
+      assert_match "Error Rate", response.body
     end
 
     test "displays provider/model breakdown table" do

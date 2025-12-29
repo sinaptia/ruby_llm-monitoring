@@ -18,6 +18,8 @@ ActiveRecord::Schema[8.1].define(version: 2025_12_08_171258) do
     t.datetime "created_at", null: false
     t.float "duration"
     t.float "end"
+    t.virtual "exception_class", type: :string, as: "json_extract(payload, '$.exception[0]')", stored: true
+    t.virtual "exception_message", type: :string, as: "json_extract(payload, '$.exception[1]')", stored: true
     t.float "gc_time"
     t.float "idle_time"
     t.virtual "input_tokens", type: :integer, as: "CAST(payload->>'input_tokens' AS INTEGER)", stored: true
