@@ -34,3 +34,6 @@ VCR.configure do |config|
   config.filter_sensitive_data("<GEMINI_API_KEY>") { RubyLLM.config.gemini_api_key }
   config.filter_sensitive_data("<OLLAMA_API_BASE>") { RubyLLM.config.ollama_api_base }
 end
+
+# Allow WebMock outside of VCR cassettes for alert tests
+WebMock.allow_net_connect!

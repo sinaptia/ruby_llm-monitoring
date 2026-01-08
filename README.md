@@ -84,6 +84,91 @@ RubyLLM::Monitoring::Engine.middleware.use(Rack::Auth::Basic) do |username, pass
 end
 ```
 
+## Alerts
+
+RubyLLM::Monitoring can send alerts when certain conditions are met. Useful for monitoring cost, errors, etc.
+
+### Configuration
+
+In `config/initializers/ruby_llm_monitoring.rb`, you can set the notification channels and alert rules:
+
+```ruby
+RubyLLM::Monitoring.channels = {
+  email: { to: "team@example.com" },
+  slack: { webhook_url: ENV["SLACK_WEBHOOK_URL"] },
+}
+
+# Default cooldown between repeated alerts (optional, defaults to 5 minutes)
+RubyLLM::Monitoring.alert_cooldown = 15.minutes
+
+RubyLLM::Monitoring.alert_rules += [{
+  time_range: -> { 1.hour.ago.. },
+  rule: ->(events) { events.where.not(exception_class: nil).count > 10 },
+  channels: [:slack],
+  message: { text: "More than 10 errors in the last hour" }
+}, {
+  time_range: -> { Time.current.at_beginning_of_month.. },
+  rule: ->(events) { events.sum(:cost) >= 500 },
+  channels: [:email, :slack],
+  message: { text: "More than $500 spent this month" }
+}]
+```
+
+### Rule options
+
+| Option       | Required | Description                                                                 |
+| ------------ | -------- | --------------------------------------------------------------------------- |
+| `time_range` | Yes      | Lambda returning a range for filtering events (e.g., `-> { 1.hour.ago.. }`) |
+| `rule`       | Yes      | Lambda receiving events scope, returns true to trigger alert                |
+| `channels`   | Yes      | Array of channel names to notify                                            |
+| `message`    | Yes      | Hash with `:text` key for the alert message                                 |
+| `id`         | No       | Identifier for debugging and cooldown tracking                              |
+| `cooldown`   | No       | Override default cooldown for this rule                                     |
+
+### Built-in channels
+
+#### Slack
+
+```ruby
+RubyLLM::Monitoring.channels = {
+  slack: {
+    webhook_url: ENV["SLACK_WEBHOOK_URL"]
+  }
+}
+```
+
+#### Email
+
+```ruby
+RubyLLM::Monitoring.channels = {
+  email: {
+    to: "team@example.com",
+    from: "alerts@example.com",  # optional
+    subject: "LLM Alert"         # optional
+  }
+}
+```
+
+### Custom channels
+
+Register custom notification channels:
+
+```ruby
+class PagerDutyChannel < RubyLLM::Monitoring::Channels::Base
+  def self.deliver(message, config)
+    # Your implementation
+    # message[:text] contains the alert text
+    # config contains channel configuration
+  end
+end
+
+RubyLLM::Monitoring.channel_registry.register(:pagerduty, PagerDutyChannel)
+
+RubyLLM::Monitoring.channels = {
+  pagerduty: { api_key: ENV["PAGERDUTY_API_KEY"] }
+}
+```
+
 ## Contributing
 
 You can open an issue or a PR in GitHub.
