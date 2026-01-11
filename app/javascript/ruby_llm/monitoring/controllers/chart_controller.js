@@ -76,12 +76,6 @@ export default class extends Controller {
       }
     }
 
-    if (this.formatter === "size") {
-      f = function(value) {
-        return byteSize(value)
-      }
-    }
-
     if (this.formatter === "ms") {
       f = function(value) {
         return `${value.toFixed(2)} ms`
