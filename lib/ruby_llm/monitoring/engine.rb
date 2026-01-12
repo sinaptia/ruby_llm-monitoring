@@ -51,6 +51,11 @@ module RubyLLM
       initializer "ruby_llm_monitoring.event_subscribe" do
         ActiveSupport::Notifications.subscribe /ruby_llm/, EventSubscriber.new
       end
+
+      initializer "ruby_llm_monitoring.register_builtin_channels" do
+        RubyLLM::Monitoring.channel_registry.register :slack, Channels::Slack
+        RubyLLM::Monitoring.channel_registry.register :email, Channels::Email
+      end
     end
   end
 end

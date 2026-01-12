@@ -17,6 +17,8 @@ jobs:
         with:
           ruby-version: ruby-3.4.6
           bundler-cache: true
+        env:
+          BUNDLE_GITHUB__COM: x-access-token:${{ secrets.REPO_SCOPED_TOKEN }}
 
       - name: Lint code for consistent style
         run: bin/rubocop -f github
@@ -42,6 +44,8 @@ jobs:
         with:
           ruby-version: ruby-3.4.6
           bundler-cache: true
+        env:
+          BUNDLE_GITHUB__COM: x-access-token:${{ secrets.REPO_SCOPED_TOKEN }}
 
       - name: Setup database
         env:

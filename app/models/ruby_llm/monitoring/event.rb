@@ -1,5 +1,7 @@
 module RubyLLM::Monitoring
   class Event < ApplicationRecord
+    include Alertable
+
     before_validation :set_cost
 
     private

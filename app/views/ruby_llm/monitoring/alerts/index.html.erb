@@ -1,0 +1,26 @@
+<% content_for :title, "Alerts" %>
+
+<% if @alert_rules.any? %>
+  <table class="table is-hoverable is-fullwidth">
+    <thead>
+      <tr>
+        <th>Time range</th>
+        <th>Channels</th>
+        <th>Message</th>
+        <th>Status</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @alert_rules.each do |alert_rule| %>
+        <tr>
+          <td><%= time_range = alert_rule[:time_range].call %></td>
+          <td><%= alert_rule[:channels].to_sentence %></td>
+          <td><%= alert_rule[:message][:text] %></td>
+          <td><%= alert_rule[:rule].call(RubyLLM::Monitoring::Event.where(created_at: time_range)) ? "🟢" : "🔴" %></td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+<% else %>
+  <div class="mt-6 has-text-centered is-size-4 has-text-grey">There are no alert rules</div>
+<% end %>
