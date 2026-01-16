@@ -85,6 +85,33 @@ RubyLLM::Monitoring::Engine.middleware.use(Rack::Auth::Basic) do |username, pass
 end
 ```
 
+## Tags
+
+You can attach custom tags to any RubyLLM call for tracking, attribution, or analytics purposes. This is useful for tracking usage by user, feature, or any other dimension.
+
+```ruby
+# For Chat (set on the instance)
+chat = RubyLLM.chat(model: "gpt-4")
+chat.tags = { user_id: current_user.id, feature: "chat_assistant" }
+chat.ask("Hello")
+
+# For class methods (pass as argument)
+RubyLLM::Embedding.embed("text", tags: { user_id: current_user.id, feature: "search" })
+```
+
+Tags are stored in the `tags` JSON column and can be queried:
+
+```ruby
+# Find events by user
+RubyLLM::Monitoring::Event.where("tags->>'user_id' = ?", user.id.to_s)
+
+# Sum cost by feature
+RubyLLM::Monitoring::Event.where("tags->>'feature' = ?", "chat_assistant").sum(:cost)
+
+# PostgreSQL: Group by tag value
+RubyLLM::Monitoring::Event.group("tags->>'feature'").sum(:cost)
+```
+
 ## Alerts
 
 RubyLLM::Monitoring can send alerts when certain conditions are met. Useful for monitoring cost, errors, etc.

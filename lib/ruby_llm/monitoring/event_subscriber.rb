@@ -11,6 +11,7 @@ module RubyLLM
           idle_time: event.idle_time,
           name: event.name,
           payload: event.payload,
+          tags: event.payload[:tags],
           time: event.time,
           transaction_id: event.transaction_id
         )
