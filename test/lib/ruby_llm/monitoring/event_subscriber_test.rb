@@ -48,5 +48,22 @@ module RubyLLM::Monitoring
       assert_equal "StandardError", event.exception_class
       assert_equal "Something went wrong", event.exception_message
     end
+
+    test "stores metadata from payload" do
+      notification_event = ActiveSupport::Notifications::Event.new(
+        "complete_chat.ruby_llm",
+        Time.current,
+        Time.current + 1.second,
+        "transaction-789",
+        { provider: "ollama", model: "gemma3", input_tokens: 100, output_tokens: 50, metadata: { user_id: 123, feature: "chat_assistant" } }
+      )
+
+      assert_difference "Event.count", 1 do
+        EventSubscriber.new.call(notification_event)
+      end
+
+      event = Event.last
+      assert_equal({ "user_id" => 123, "feature" => "chat_assistant" }, event.payload["metadata"])
+    end
   end
 end
