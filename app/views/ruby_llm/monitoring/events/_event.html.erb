@@ -1,0 +1,8 @@
+<tr>
+  <td><%= link_to "##{event.id}", event %></td>
+  <td><%= event.name %></td>
+  <td><%= event.provider %>/<%= event.model %></td>
+  <td><%= event.created_at %></td>
+  <td><%= event.duration.round 2 %> ms</td>
+  <td>$<%= event.cost.try(:round, 4) %></td>
+</tr>

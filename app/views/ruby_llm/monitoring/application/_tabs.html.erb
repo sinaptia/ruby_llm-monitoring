@@ -1,6 +1,7 @@
 <div class="tabs is-boxed">
   <ul>
     <li class="<%= "is-active" if controller_name == "metrics" %>"><%= link_to "Metrics", root_path %></li>
+    <li class="<%= "is-active" if controller_name == "events" %>"><%= link_to "Events", events_path %></li>
     <li class="<%= "is-active" if controller_name == "alerts" %>"><%= link_to "Alerts", alerts_path %></li>
   </ul>
 </div>

@@ -1,0 +1,25 @@
+<% content_for :title, "Events" %>
+
+<%= render "filters", clear_path: events_path %>
+
+<% if @events.records.any? %>
+  <table class="table is-hoverable is-fullwidth">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Name</th>
+        <th>Provider/Model</th>
+        <th>Created at</th>
+        <th>Duration</th>
+        <th>Cost</th>
+      </tr>
+    </thead>
+    <tbody>
+      <%= render partial: "ruby_llm/monitoring/events/event", collection: @events.records %>
+    </tbody>
+  </table>
+<% else %>
+  <div class="mt-6 has-text-centered is-size-4 has-text-grey">There are no events</div>
+<% end %>
+
+<%= render "ruby_llm/monitoring/application/pagination", page: @events %>

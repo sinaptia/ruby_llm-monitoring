@@ -13,3 +13,8 @@
  *= require_tree .
  *= require_self
  */
+
+pre {
+  white-space: pre-wrap;
+  word-break: break-word;
+}

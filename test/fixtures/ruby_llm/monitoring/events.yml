@@ -18,6 +18,7 @@ ollama_recent:
   payload: { "provider": "ollama", "model": "llama3.2", "input_tokens": 2000, "output_tokens": 1000 }
   duration: 3200.8
   allocations: 8000
+  cost: 0.0
   cpu_time: 2500.0
   gc_time: 100.0
   idle_time: 600.0

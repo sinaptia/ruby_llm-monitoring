@@ -1,0 +1,25 @@
+<div class="level">
+  <div class="level-left">
+    <%= form_with scope: :filter, url: events_path, method: :get, data: {controller: "auto-submit"} do |form| %>
+      <div class="field is-grouped">
+        <div>
+          <%= form.label :name, class: "label" %>
+          <div class="select">
+            <%= form.select :name, event_name_options, {selected: filter_param.dig(:filter, :name), include_blank: true}, data: {action: "auto-submit#submit"} %>
+          </div>
+        </div>
+        <div>
+          <%= form.label :created_at_start, class: "label" %>
+          <%= form.datetime_field :created_at_start, value: filter_param.dig(:filter, :created_at_start), class: "input", data: {action: "input->auto-submit#submit"} %>
+        </div>
+        <div>
+          <%= form.label :created_at_end, class: "label" %>
+          <%= form.datetime_field :created_at_end, value: filter_param.dig(:filter, :created_at_end), class: "input", data: {action: "input->auto-submit#submit"} %>
+        </div>
+        <div class="is-align-self-flex-end">
+          <%= link_to "Clear", clear_path, class: "button" %>
+        </div>
+      </div>
+    <% end %>
+  </div>
+</div>

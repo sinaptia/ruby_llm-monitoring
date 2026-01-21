@@ -1,0 +1,40 @@
+<% content_for :title, "Event ##{@event.id}" %>
+
+<h1 class="title">Event #<%= @event.id %></h1>
+
+<table class="table">
+  <tbody>
+    <tr>
+      <th>Id</th>
+      <td><%= @event.id %></td>
+    </tr>
+    <tr>
+      <th>Provider/Model</th>
+      <td><%= @event.provider %>/<%= @event.model %></td>
+    </tr>
+    <tr>
+      <th>Created at</th>
+      <td><%= @event.created_at %> ms</td>
+    </tr>
+    <tr>
+      <th>Duration</th>
+      <td><%= @event.duration.round 2 %> ms</td>
+    </tr>
+    <tr>
+      <th>Cost</th>
+      <td>$<%= @event.cost.try(:round, 4) %></td>
+    </tr>
+    <tr>
+      <th>Input tokens</th>
+      <td><%= @event.input_tokens %></td>
+    </tr>
+    <tr>
+      <th>Output tokens</th>
+      <td><%= @event.output_tokens %></td>
+    </tr>
+    <tr>
+      <th>Payload</th>
+      <td><pre><%= JSON.pretty_generate @event.payload %></pre></td>
+    </tr>
+  </tbody>
+</table>
