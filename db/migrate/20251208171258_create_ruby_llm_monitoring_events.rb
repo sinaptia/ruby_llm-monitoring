@@ -1,4 +1,4 @@
-class CreateRubyLLMMonitoringEvents < ActiveRecord::Migration[7.0]
+class CreateRubyLLMMonitoringEvents < ActiveRecord::Migration[7.2]
   def change
     create_table :ruby_llm_monitoring_events do |t|
       t.integer :allocations
