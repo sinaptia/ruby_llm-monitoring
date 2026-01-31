@@ -85,6 +85,86 @@ RubyLLM::Monitoring::Engine.middleware.use(Rack::Auth::Basic) do |username, pass
 end
 ```
 
+## Metrics
+
+The dashboard displays four metrics by default: Throughput, Cost, Response Time, and Error Rate. You can customize which metrics are shown or add your own custom metrics.
+
+### Configuration
+
+In `config/initializers/ruby_llm_monitoring.rb`, you can configure which metrics are displayed:
+
+```ruby
+RubyLLM::Monitoring.metrics = [
+  RubyLLM::Monitoring::Metrics::Throughput,
+  RubyLLM::Monitoring::Metrics::Cost,
+  RubyLLM::Monitoring::Metrics::ResponseTime,
+  RubyLLM::Monitoring::Metrics::ErrorRate
+]
+```
+
+To remove a metric, simply omit it from the array:
+
+```ruby
+RubyLLM::Monitoring.metrics = [
+  RubyLLM::Monitoring::Metrics::Throughput,
+  RubyLLM::Monitoring::Metrics::Cost
+]
+```
+
+### Custom metrics
+
+Create custom metrics by inheriting from `RubyLLM::Monitoring::Metrics::Base`:
+
+```ruby
+class CostByFeature < RubyLLM::Monitoring::Metrics::Base
+  name "Cost by Feature"
+  unit "money"
+
+  private
+
+  def metric_data
+    # Extract metadata from JSON payload and group by feature
+    scope.group("json_extract(payload, '$.metadata.feature')").sum(:cost)
+  end
+
+  def build_series(aggregated_data)
+    aggregated_data
+      .group_by { |(_, feature), _| [feature || "unknown"] }
+      .transform_values { |entries|
+        entries.map { |(timestamp, _), value|
+          [timestamp.to_i * 1000, value || default_value]
+        }
+      }
+      .map { |keys, data| { name: keys.first, data: data } }
+  end
+end
+```
+
+The `scope` is an ActiveRecord relation of `Event` records grouped by time bucket. Your `metric_data` method should return aggregated data that will be displayed as a time series chart.
+
+**Note:** JSON extraction syntax varies by database:
+- **SQLite**: `json_extract(payload, '$.metadata.feature')`
+- **PostgreSQL**: `payload->'metadata'->>'feature'`
+- **MySQL**: `payload->>'$.metadata.feature'`
+
+This example assumes you're setting metadata using `RubyLLM::Instrumentation.with()`:
+
+```ruby
+RubyLLM::Instrumentation.with(feature: "chat_assistant") do
+  RubyLLM.chat.ask("Hello")
+end
+```
+
+Then add your custom metric to the configuration:
+
+```ruby
+RubyLLM::Monitoring.metrics = [
+  RubyLLM::Monitoring::Metrics::Throughput,
+  RubyLLM::Monitoring::Metrics::Cost,
+  CostByFeature
+]
+```
+
 ## Alerts
 
 RubyLLM::Monitoring can send alerts when certain conditions are met. Useful for monitoring cost, errors, etc.

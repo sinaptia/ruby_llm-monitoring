@@ -34,6 +34,7 @@
           <th class="has-text-right">Requests</th>
           <th class="has-text-right">Cost</th>
           <th class="has-text-right">Avg Response Time</th>
+          <th class="has-text-right">Error Rate</th>
         </tr>
       </thead>
       <tbody>
@@ -43,6 +44,7 @@
             <td class="has-text-right"><%= number_with_delimiter(row.requests) %></td>
             <td class="has-text-right"><%= number_to_currency(row.cost || 0) %></td>
             <td class="has-text-right"><%= row.avg_response_time ? "#{row.avg_response_time.round(1)}ms" : "N/A" %></td>
+            <td class="has-text-right"><%= row.requests.positive? ? (row.error_count.to_f / row.requests * 100).round(1) : 0 %>%</td>
           </tr>
         <% end %>
       </tbody>
