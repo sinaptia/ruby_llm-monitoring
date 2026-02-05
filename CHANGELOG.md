@@ -10,3 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Events controller. [#23](https://github.com/sinaptia/ruby_llm-monitoring/pull/23) [@patriciomacadden](https://github.com/patriciomacadden)
+
+### Changed
+
+- New metrics controller that allows defining custom charts. [#25](https://github.com/sinaptia/ruby_llm-monitoring/pull/25) [@patriciomacadden](https://github.com/patriciomacadden)

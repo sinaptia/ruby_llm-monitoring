@@ -59,6 +59,7 @@ no_tokens:
   duration: 500.0
   allocations: 2000
   cpu_time: 300.0
+  cost: 0.0
   gc_time: 20.0
   idle_time: 180.0
   time: <%= Time.current.to_f %>
@@ -78,3 +79,256 @@ anthropic_error:
   end: <%= (Time.current + 1.second).to_f %>
   transaction_id: "txn-anthropic-error"
   created_at: <%= 30.minutes.ago %>
+
+ollama_for_base_test:
+  name: "complete_chat.ruby_llm"
+  payload: { "provider": "ollama", "model": "llama3.2", "input_tokens": 100, "output_tokens": 50 }
+  duration: 100
+  allocations: 1000
+  cost: 0.0
+  cpu_time: 50.0
+  gc_time: 10.0
+  idle_time: 40.0
+  time: <%= Time.current.to_f %>
+  end: <%= (Time.current + 0.1.seconds).to_f %>
+  transaction_id: "txn-ollama-base-test"
+  created_at: <%= Time.zone.parse("2025-01-01 12:10:00") %>
+
+# Test fixtures for metrics tests
+cost_test_1:
+  name: "complete_chat.ruby_llm"
+  payload: { "provider": "ollama", "model": "llama3.2", "input_tokens": 100, "output_tokens": 50 }
+  duration: 100
+  allocations: 1000
+  cost: 0.0
+  cpu_time: 50.0
+  gc_time: 10.0
+  idle_time: 40.0
+  time: <%= Time.current.to_f %>
+  end: <%= (Time.current + 0.1.seconds).to_f %>
+  transaction_id: "txn-cost-test-1"
+  created_at: <%= Time.zone.parse("2025-01-02 12:10:00") %>
+
+cost_test_2:
+  name: "complete_chat.ruby_llm"
+  payload: { "provider": "ollama", "model": "llama3.2", "input_tokens": 100, "output_tokens": 50 }
+  duration: 100
+  allocations: 1000
+  cost: 0.0
+  cpu_time: 50.0
+  gc_time: 10.0
+  idle_time: 40.0
+  time: <%= Time.current.to_f %>
+  end: <%= (Time.current + 0.1.seconds).to_f %>
+  transaction_id: "txn-cost-test-2"
+  created_at: <%= Time.zone.parse("2025-01-02 12:30:00") %>
+
+cost_test_3:
+  name: "complete_chat.ruby_llm"
+  payload: { "provider": "ollama", "model": "llama3.2", "input_tokens": 100, "output_tokens": 50 }
+  duration: 100
+  allocations: 1000
+  cost: 0.0
+  cpu_time: 50.0
+  gc_time: 10.0
+  idle_time: 40.0
+  time: <%= Time.current.to_f %>
+  end: <%= (Time.current + 0.1.seconds).to_f %>
+  transaction_id: "txn-cost-test-3"
+  created_at: <%= Time.zone.parse("2025-01-02 12:11:00") %>
+
+error_test_with_error:
+  name: "complete_chat.ruby_llm"
+  payload: { "provider": "ollama", "model": "llama3.2", "input_tokens": 100, "output_tokens": 50, "exception": ["TimeoutError", "Request timed out"] }
+  duration: 100
+  allocations: 1000
+  cost: 0.0
+  cpu_time: 50.0
+  gc_time: 10.0
+  idle_time: 40.0
+  time: <%= Time.current.to_f %>
+  end: <%= (Time.current + 0.1.seconds).to_f %>
+  transaction_id: "txn-error-test-1"
+  created_at: <%= Time.zone.parse("2025-01-03 12:10:00") %>
+
+error_test_without_error:
+  name: "complete_chat.ruby_llm"
+  payload: { "provider": "ollama", "model": "llama3.2", "input_tokens": 100, "output_tokens": 50 }
+  duration: 100
+  allocations: 1000
+  cost: 0.0
+  cpu_time: 50.0
+  gc_time: 10.0
+  idle_time: 40.0
+  time: <%= Time.current.to_f %>
+  end: <%= (Time.current + 0.1.seconds).to_f %>
+  transaction_id: "txn-error-test-2"
+  created_at: <%= Time.zone.parse("2025-01-03 12:30:00") %>
+
+error_test_gemma3_error_1:
+  name: "complete_chat.ruby_llm"
+  payload: { "provider": "ollama", "model": "gemma3", "input_tokens": 100, "output_tokens": 50, "exception": ["TimeoutError", "Request timed out"] }
+  duration: 100
+  allocations: 1000
+  cost: 0.0
+  cpu_time: 50.0
+  gc_time: 10.0
+  idle_time: 40.0
+  time: <%= Time.current.to_f %>
+  end: <%= (Time.current + 0.1.seconds).to_f %>
+  transaction_id: "txn-error-test-gemma3-1"
+  created_at: <%= Time.zone.parse("2025-01-03 12:10:00") %>
+
+error_test_gemma3_error_2:
+  name: "complete_chat.ruby_llm"
+  payload: { "provider": "ollama", "model": "gemma3", "input_tokens": 100, "output_tokens": 50, "exception": ["TimeoutError", "Request timed out"] }
+  duration: 100
+  allocations: 1000
+  cost: 0.0
+  cpu_time: 50.0
+  gc_time: 10.0
+  idle_time: 40.0
+  time: <%= Time.current.to_f %>
+  end: <%= (Time.current + 0.1.seconds).to_f %>
+  transaction_id: "txn-error-test-gemma3-2"
+  created_at: <%= Time.zone.parse("2025-01-03 12:10:00") %>
+
+error_test_gemma3_no_error:
+  name: "complete_chat.ruby_llm"
+  payload: { "provider": "ollama", "model": "gemma3", "input_tokens": 100, "output_tokens": 50 }
+  duration: 100
+  allocations: 1000
+  cost: 0.0
+  cpu_time: 50.0
+  gc_time: 10.0
+  idle_time: 40.0
+  time: <%= Time.current.to_f %>
+  end: <%= (Time.current + 0.1.seconds).to_f %>
+  transaction_id: "txn-error-test-gemma3-3"
+  created_at: <%= Time.zone.parse("2025-01-03 12:10:00") %>
+
+response_time_test_1:
+  name: "complete_chat.ruby_llm"
+  payload: { "provider": "ollama", "model": "llama3.2", "input_tokens": 100, "output_tokens": 50 }
+  duration: 100
+  allocations: 1000
+  cost: 0.0
+  cpu_time: 50.0
+  gc_time: 10.0
+  idle_time: 40.0
+  time: <%= Time.current.to_f %>
+  end: <%= (Time.current + 0.1.seconds).to_f %>
+  transaction_id: "txn-response-time-1"
+  created_at: <%= Time.zone.parse("2025-01-04 12:10:00") %>
+
+response_time_test_2:
+  name: "complete_chat.ruby_llm"
+  payload: { "provider": "ollama", "model": "llama3.2", "input_tokens": 100, "output_tokens": 50 }
+  duration: 200
+  allocations: 1000
+  cost: 0.0
+  cpu_time: 50.0
+  gc_time: 10.0
+  idle_time: 40.0
+  time: <%= Time.current.to_f %>
+  end: <%= (Time.current + 0.2.seconds).to_f %>
+  transaction_id: "txn-response-time-2"
+  created_at: <%= Time.zone.parse("2025-01-04 12:30:00") %>
+
+response_time_gemma3_1:
+  name: "complete_chat.ruby_llm"
+  payload: { "provider": "ollama", "model": "gemma3", "input_tokens": 100, "output_tokens": 50 }
+  duration: 100
+  allocations: 1000
+  cost: 0.0
+  cpu_time: 50.0
+  gc_time: 10.0
+  idle_time: 40.0
+  time: <%= Time.current.to_f %>
+  end: <%= (Time.current + 0.1.seconds).to_f %>
+  transaction_id: "txn-response-time-gemma3-1"
+  created_at: <%= Time.zone.parse("2025-01-04 12:10:00") %>
+
+response_time_gemma3_2:
+  name: "complete_chat.ruby_llm"
+  payload: { "provider": "ollama", "model": "gemma3", "input_tokens": 100, "output_tokens": 50 }
+  duration: 200
+  allocations: 1000
+  cost: 0.0
+  cpu_time: 50.0
+  gc_time: 10.0
+  idle_time: 40.0
+  time: <%= Time.current.to_f %>
+  end: <%= (Time.current + 0.2.seconds).to_f %>
+  transaction_id: "txn-response-time-gemma3-2"
+  created_at: <%= Time.zone.parse("2025-01-04 12:11:00") %>
+
+throughput_test_1:
+  name: "complete_chat.ruby_llm"
+  payload: { "provider": "ollama", "model": "llama3.2", "input_tokens": 100, "output_tokens": 50 }
+  duration: 100
+  allocations: 1000
+  cost: 0.0
+  cpu_time: 50.0
+  gc_time: 10.0
+  idle_time: 40.0
+  time: <%= Time.current.to_f %>
+  end: <%= (Time.current + 0.1.seconds).to_f %>
+  transaction_id: "txn-throughput-1"
+  created_at: <%= Time.zone.parse("2025-01-05 12:10:00") %>
+
+throughput_test_2:
+  name: "complete_chat.ruby_llm"
+  payload: { "provider": "ollama", "model": "llama3.2", "input_tokens": 100, "output_tokens": 50 }
+  duration: 100
+  allocations: 1000
+  cost: 0.0
+  cpu_time: 50.0
+  gc_time: 10.0
+  idle_time: 40.0
+  time: <%= Time.current.to_f %>
+  end: <%= (Time.current + 0.1.seconds).to_f %>
+  transaction_id: "txn-throughput-2"
+  created_at: <%= Time.zone.parse("2025-01-05 12:30:00") %>
+
+throughput_test_gemma3_1:
+  name: "complete_chat.ruby_llm"
+  payload: { "provider": "ollama", "model": "gemma3", "input_tokens": 100, "output_tokens": 50 }
+  duration: 100
+  allocations: 1000
+  cost: 0.0
+  cpu_time: 50.0
+  gc_time: 10.0
+  idle_time: 40.0
+  time: <%= Time.current.to_f %>
+  end: <%= (Time.current + 0.1.seconds).to_f %>
+  transaction_id: "txn-throughput-gemma3-1"
+  created_at: <%= Time.zone.parse("2025-01-05 12:10:00") %>
+
+throughput_test_gemma3_2:
+  name: "complete_chat.ruby_llm"
+  payload: { "provider": "ollama", "model": "gemma3", "input_tokens": 100, "output_tokens": 50 }
+  duration: 100
+  allocations: 1000
+  cost: 0.0
+  cpu_time: 50.0
+  gc_time: 10.0
+  idle_time: 40.0
+  time: <%= Time.current.to_f %>
+  end: <%= (Time.current + 0.1.seconds).to_f %>
+  transaction_id: "txn-throughput-gemma3-2"
+  created_at: <%= Time.zone.parse("2025-01-05 12:10:00") %>
+
+throughput_test_gemma3_3:
+  name: "complete_chat.ruby_llm"
+  payload: { "provider": "ollama", "model": "gemma3", "input_tokens": 100, "output_tokens": 50 }
+  duration: 100
+  allocations: 1000
+  cost: 0.0
+  cpu_time: 50.0
+  gc_time: 10.0
+  idle_time: 40.0
+  time: <%= Time.current.to_f %>
+  end: <%= (Time.current + 0.1.seconds).to_f %>
+  transaction_id: "txn-throughput-gemma3-3"
+  created_at: <%= Time.zone.parse("2025-01-05 12:10:00") %>
