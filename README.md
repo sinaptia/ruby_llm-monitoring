@@ -21,7 +21,7 @@ $ bundle
 
 To copy and migrate RubyLLM::Monitoring's migrations, run:
 
-```
+```bash
 $ rails ruby_llm_monitoring:install:migrations db:migrate
 ```
 
@@ -98,7 +98,7 @@ RubyLLM::Monitoring.metrics = [
   RubyLLM::Monitoring::Metrics::Throughput,
   RubyLLM::Monitoring::Metrics::Cost,
   RubyLLM::Monitoring::Metrics::ResponseTime,
-  RubyLLM::Monitoring::Metrics::ErrorRate
+  RubyLLM::Monitoring::Metrics::ErrorCount
 ]
 ```
 
@@ -107,7 +107,8 @@ To remove a metric, simply omit it from the array:
 ```ruby
 RubyLLM::Monitoring.metrics = [
   RubyLLM::Monitoring::Metrics::Throughput,
-  RubyLLM::Monitoring::Metrics::Cost
+  RubyLLM::Monitoring::Metrics::Cost,
+  RubyLLM::Monitoring::Metrics::ResponseTime
 ]
 ```
 
@@ -117,7 +118,7 @@ Create custom metrics by inheriting from `RubyLLM::Monitoring::Metrics::Base`:
 
 ```ruby
 class CostByFeature < RubyLLM::Monitoring::Metrics::Base
-  name "Cost by Feature"
+  title "Cost by Feature"
   unit "money"
 
   private
@@ -203,7 +204,6 @@ RubyLLM::Monitoring.alert_rules += [{
 | `rule`       | Yes      | Lambda receiving events scope, returns true to trigger alert                |
 | `channels`   | Yes      | Array of channel names to notify                                            |
 | `message`    | Yes      | Hash with `:text` key for the alert message                                 |
-| `id`         | No       | Identifier for debugging and cooldown tracking                              |
 | `cooldown`   | No       | Override default cooldown for this rule                                     |
 
 ### Built-in channels
