@@ -10,10 +10,18 @@ module RubyLLM
           gc_time: event.gc_time,
           idle_time: event.idle_time,
           name: event.name,
-          payload: event.payload,
+          payload: clean_payload(event.payload),
           time: event.time,
           transaction_id: event.transaction_id
         )
+      end
+
+      private
+
+      def clean_payload(payload)
+        payload.tap do |p|
+          p[:chat]&.messages&.each(&:clear!)
+        end
       end
     end
   end

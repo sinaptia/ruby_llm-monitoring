@@ -48,5 +48,22 @@ module RubyLLM::Monitoring
       assert_equal "StandardError", event.exception_class
       assert_equal "Something went wrong", event.exception_message
     end
+
+    test "handles payload with chat messages containing attachments" do
+      VCR.use_cassette "event_subscriber_test_cleans_event_payload_when_chat_is_completed" do
+        RubyLLM::Chat.new(model: "gemini-3-pro-image-preview").ask("Remove the purse from the model.", with: [ "https://app-cdn.osello.com/u/image_asset/oimg_1sEDBYq08L/upload/4d80ce71943f8ae131bf64605ad01f5e" ])
+
+        event = Event.last
+        assert_equal "complete_chat.ruby_llm", event.name
+        messages = event.payload["chat"]
+
+        messages.each do |message|
+          assert_equal [], message["content"]["attachments"]
+          if message["thinking"].present?
+            assert message.dig("thinking", "signature").blank?
+          end
+        end
+      end
+    end
   end
 end

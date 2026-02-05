@@ -1,6 +1,9 @@
 # Configure Rails Environment
 ENV["RAILS_ENV"] = "test"
 
+require "dotenv"
+Dotenv.load
+
 require_relative "../test/dummy/config/environment"
 ActiveRecord::Migrator.migrations_paths = [ File.expand_path("../test/dummy/db/migrate", __dir__) ]
 ActiveRecord::Migrator.migrations_paths << File.expand_path("../db/migrate", __dir__)
@@ -8,10 +11,7 @@ require "rails/test_help"
 
 RubyLLM.configure do |config|
   config.ollama_api_base = ENV.fetch("OLLAMA_API_BASE", "http://localhost:11434")
-
   config.gemini_api_key = ENV.fetch("GEMINI_API_KEY", "test-api-key")
-
-  # Use the new association-based acts_as API (recommended)
   config.use_new_acts_as = true
 end
 
