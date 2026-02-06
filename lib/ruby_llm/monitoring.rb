@@ -1,8 +1,5 @@
 require "groupdate"
 require "ruby_llm"
-require "ruby_llm/ext/content"
-require "ruby_llm/ext/message"
-require "ruby_llm/ext/thinking"
 require "ruby_llm/instrumentation"
 require "ruby_llm/monitoring/channel_registry"
 require "ruby_llm/monitoring/engine"

@@ -55,14 +55,7 @@ module RubyLLM::Monitoring
 
         event = Event.last
         assert_equal "complete_chat.ruby_llm", event.name
-        messages = event.payload["chat"]
-
-        messages.each do |message|
-          assert_equal [], message["content"]["attachments"]
-          if message["thinking"].present?
-            assert message.dig("thinking", "signature").blank?
-          end
-        end
+        assert event.payload[:chat].blank?
       end
     end
   end
