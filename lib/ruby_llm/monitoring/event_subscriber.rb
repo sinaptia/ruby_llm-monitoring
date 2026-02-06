@@ -10,7 +10,7 @@ module RubyLLM
           gc_time: event.gc_time,
           idle_time: event.idle_time,
           name: event.name,
-          payload: event.payload,
+          payload: event.payload.except(:chat, :response),
           time: event.time,
           transaction_id: event.transaction_id
         )
