@@ -11,6 +11,8 @@ module RubyLLM::Monitoring
 
       self.cost = if provider.local? || [ payload["input_tokens"], payload["output_tokens"] ].all?(nil)
         0.0
+      elsif model.modalities.output == ["embeddings"]
+        payload["input_tokens"] / 1_000_000.0 * model.input_price_per_million
       else
         input_cost = payload["input_tokens"] / 1_000_000.0 * model.input_price_per_million
         output_cost = payload["output_tokens"] / 1_000_000.0 * model.output_price_per_million
