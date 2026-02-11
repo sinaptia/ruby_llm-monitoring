@@ -18,4 +18,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - Events failed to be saved when RubyLLM::Chat had attachments. Now the payload drops the chat and the response objects before saving. Fixes [#18](https://github.com/sinaptia/ruby_llm-monitoring/issues/18). [#29](https://github.com/sinaptia/ruby_llm-monitoring/pull/29) [@patriciomacadden](https://github.com/patriciomacadden)
-
+- Use the correct mysql2 adapter. Fixes [#31](https://github.com/sinaptia/ruby_llm-monitoring/issues/31). [#33](https://github.com/sinaptia/ruby_llm-monitoring/pull/33) [@patriciomacadden](https://github.com/patriciomacadden)
