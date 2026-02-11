@@ -29,8 +29,8 @@ class CreateRubyLLMMonitoringEvents < ActiveRecord::Migration[7.2]
   def json_extract(field, as: nil)
     base_expr = case adapter_name.downcase
     when "mysql2"
-      "payload->>'$.#{field}'"
-    when "postgres", "sqlite"
+      "JSON_UNQUOTE(JSON_EXTRACT(payload, '$.#{field}'))"
+    else
       "payload->>'#{field}'"
     end
 
@@ -38,22 +38,22 @@ class CreateRubyLLMMonitoringEvents < ActiveRecord::Migration[7.2]
 
     case adapter_name.downcase
     when "mysql2"
-      "CAST(#{base_expr} AS UNSIGNED)"
-    when "postgres"
-      "(#{base_expr})::integer"
-    when "sqlite"
-      "CAST(#{base_expr} AS INTEGER)"
+      "CAST(JSON_UNQUOTE(JSON_EXTRACT(payload, '$.#{field}')) AS UNSIGNED)"
+    when "postgresql"
+      "(payload->>'#{field}')::integer"
+    else
+      "CAST(payload->>'#{field}' AS INTEGER)"
     end
   end
 
   def json_extract_array(field, index, as: nil)
-    case adapter_name.downcase
+    base_expr = case adapter_name.downcase
     when "mysql2"
-      base_expr = "JSON_UNQUOTE(JSON_EXTRACT(payload, '$.#{field}[#{index}]'))"
-    when "postgres"
-      base_expr = "(payload->'#{field}'->>#{index})"
-    when "sqlite"
-      base_expr = "json_extract(payload, '$.#{field}[#{index}]')"
+      "JSON_UNQUOTE(JSON_EXTRACT(payload, '$.#{field}[#{index}]'))"
+    when "postgresql"
+      "(payload->'#{field}'->>#{index})"
+    else
+      "json_extract(payload, '$.#{field}[#{index}]')"
     end
 
     return base_expr unless as == :integer
@@ -61,9 +61,9 @@ class CreateRubyLLMMonitoringEvents < ActiveRecord::Migration[7.2]
     case adapter_name.downcase
     when "mysql2"
       "CAST(#{base_expr} AS UNSIGNED)"
-    when "postgres"
+    when "postgresql"
       "(#{base_expr})::integer"
-    when "sqlite"
+    else
       "CAST(#{base_expr} AS INTEGER)"
     end
   end

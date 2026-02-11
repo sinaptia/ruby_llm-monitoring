@@ -161,6 +161,8 @@ GEM
     minitest (6.0.1)
       prism (~> 1.5)
     multipart-post (2.4.1)
+    mysql2 (0.5.7)
+      bigdecimal
     net-http (0.9.1)
       uri (>= 0.11.1)
     net-imap (0.6.2)
@@ -193,6 +195,13 @@ GEM
     parser (3.3.10.1)
       ast (~> 2.4.1)
       racc
+    pg (1.6.3)
+    pg (1.6.3-aarch64-linux)
+    pg (1.6.3-aarch64-linux-musl)
+    pg (1.6.3-arm64-darwin)
+    pg (1.6.3-x86_64-darwin)
+    pg (1.6.3-x86_64-linux)
+    pg (1.6.3-x86_64-linux-musl)
     pp (0.6.3)
       prettyprint
     prettyprint (0.2.0)
@@ -345,6 +354,8 @@ PLATFORMS
 DEPENDENCIES
   debug (>= 1.0.0)
   dotenv
+  mysql2
+  pg
   propshaft
   puma
   rubocop-rails-omakase

@@ -17,8 +17,6 @@ jobs:
         with:
           ruby-version: ruby-3.4.6
           bundler-cache: true
-        env:
-          BUNDLE_GITHUB__COM: x-access-token:${{ secrets.REPO_SCOPED_TOKEN }}
 
       - name: Lint code for consistent style
         run: bin/rubocop -f github
@@ -30,21 +28,43 @@ jobs:
       fail-fast: false
       matrix:
         ruby-version: ["3.2", "3.3", "3.4", "4.0"]
-        rails-version: ["rails-7.2", "rails-8.0", "rails-8.1"]
-        exclude:
-          - ruby-version: "3.1"
-            rails-version: "rails-8.0"
-          - ruby-version: "3.1"
-            rails-version: "rails-8.1"
+        rails-version: ["7.2", "8.0", "8.1"]
+        db-adapter: ["mysql2", "postgresql", "sqlite3"]
 
-    name: Test (ruby-${{ matrix.ruby-version }}, ${{ matrix.rails-version }})
+    name: Test (ruby-${{ matrix.ruby-version }}, rails-${{ matrix.rails-version }}, ${{ matrix.db-adapter }})
 
     env:
-      BUNDLE_GEMFILE: ${{ github.workspace }}/gemfiles/${{ matrix.rails-version }}.gemfile
+      BUNDLE_GEMFILE: ${{ github.workspace }}/gemfiles/rails-${{ matrix.rails-version }}.gemfile
+      DB_ADAPTER: ${{ matrix.db-adapter }}
+
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: test
+        options: >-
+          --health-cmd="mysqladmin ping"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=3
+        ports:
+          - 3306:3306
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_PASSWORD: postgres
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
 
     steps:
       - name: Install packages
-        run: sudo apt-get update && sudo apt-get install --no-install-recommends -y build-essential git libyaml-dev pkg-config google-chrome-stable
+        run: sudo apt-get update && sudo apt-get install --no-install-recommends -y build-essential git libmysqlclient-dev libpq-dev libyaml-dev pkg-config
 
       - name: Checkout code
         uses: actions/checkout@v6
@@ -54,15 +74,15 @@ jobs:
         with:
           ruby-version: ${{ matrix.ruby-version }}
           bundler-cache: true
-        env:
-          BUNDLE_GITHUB__COM: x-access-token:${{ secrets.REPO_SCOPED_TOKEN }}
 
       - name: Setup database
         env:
           RAILS_ENV: test
-        run: bin/rails db:setup
+          DB_ADAPTER: ${{ matrix.db-adapter }}
+        run: rm test/dummy/db/schema.rb && bin/rails db:create db:migrate
 
       - name: Run tests
         env:
           RAILS_ENV: test
+          DB_ADAPTER: ${{ matrix.db-adapter }}
         run: bin/rails test
