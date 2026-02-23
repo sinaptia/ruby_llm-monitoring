@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- Contemplate thinking tokens in cost calculation. [#40](https://github.com/sinaptia/ruby_llm-monitoring/pull/40) [@patriciomacadden](https://github.com/patriciomacadden)
+
 ### Fixed
 
 - Fix cost calculation when input or output tokens aren't in the payload. [#30](https://github.com/sinaptia/ruby_llm-monitoring/pull/30) [@UnderpantsGnome](https://github.com/UnderpantsGnome)

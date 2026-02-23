@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2025_12_08_171258) do
+ActiveRecord::Schema[7.2].define(version: 2026_02_23_214109) do
   create_table "ruby_llm_monitoring_events", force: :cascade do |t|
     t.integer "allocations"
     t.float "cost"
@@ -28,6 +28,7 @@ ActiveRecord::Schema[7.2].define(version: 2025_12_08_171258) do
     t.virtual "output_tokens", type: :integer, as: "CAST(payload->>'output_tokens' AS INTEGER)", stored: true
     t.json "payload"
     t.virtual "provider", type: :string, as: "payload->>'provider'", stored: true
+    t.virtual "thinking_tokens", type: :integer, as: "CAST(payload->>'thinking_tokens' AS INTEGER)", stored: true
     t.float "time"
     t.string "transaction_id"
     t.datetime "updated_at", null: false

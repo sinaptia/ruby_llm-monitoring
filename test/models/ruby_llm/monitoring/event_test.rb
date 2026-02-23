@@ -16,6 +16,21 @@ module RubyLLM::Monitoring
       assert event.cost > 0.0
     end
 
+    test "calculates cost for cloud provider with thinking" do
+      event = Event.create!(
+        payload: {
+          "provider" => "gemini",
+          "model" => "gemini-2.5-flash",
+          "input_tokens" => 1000,
+          "output_tokens" => 500,
+          "thinking_tokens" => 400
+        }
+      )
+
+      assert_not_nil event.cost
+      assert event.cost > 0.0
+    end
+
     test "sets cost to zero for local provider" do
       event = ruby_llm_monitoring_events(:ollama_recent)
 

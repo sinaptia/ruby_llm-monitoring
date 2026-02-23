@@ -22,6 +22,7 @@ module RubyLLM
     end
 
     autoload :EventSubscriber, "ruby_llm/monitoring/event_subscriber"
+    autoload :MigrationHelpers, "ruby_llm/monitoring/migration_helpers"
 
     mattr_accessor :alert_cooldown, default: 5.minutes
     mattr_accessor :alert_rules, default: []
