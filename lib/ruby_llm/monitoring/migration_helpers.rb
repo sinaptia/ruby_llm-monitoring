@@ -3,7 +3,7 @@ module RubyLLM
     module MigrationHelpers
       def json_extract(field, as: nil)
         base_expr = case adapter_name.downcase
-        when "mysql2"
+        when "mysql2", "trilogy"
           "JSON_UNQUOTE(JSON_EXTRACT(payload, '$.#{field}'))"
         else
           "payload->>'#{field}'"
@@ -12,7 +12,7 @@ module RubyLLM
         return base_expr unless as == :integer
 
         case adapter_name.downcase
-        when "mysql2"
+        when "mysql2", "trilogy"
           "CAST(JSON_UNQUOTE(JSON_EXTRACT(payload, '$.#{field}')) AS UNSIGNED)"
         when "postgresql"
           "(payload->>'#{field}')::integer"
@@ -23,7 +23,7 @@ module RubyLLM
 
       def json_extract_array(field, index, as: nil)
         base_expr = case adapter_name.downcase
-        when "mysql2"
+        when "mysql2", "trilogy"
           "JSON_UNQUOTE(JSON_EXTRACT(payload, '$.#{field}[#{index}]'))"
         when "postgresql"
           "(payload->'#{field}'->>#{index})"
@@ -34,7 +34,7 @@ module RubyLLM
         return base_expr unless as == :integer
 
         case adapter_name.downcase
-        when "mysql2"
+        when "mysql2", "trilogy"
           "CAST(#{base_expr} AS UNSIGNED)"
         when "postgresql"
           "(#{base_expr})::integer"
