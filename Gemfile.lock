@@ -1,6 +1,6 @@
 GIT
   remote: https://github.com/sinaptia/ruby_llm-instrumentation.git
-  revision: 0532fe30d58ac8e36f5bb55f65622fa07ca85d51
+  revision: 29314e69deba01239b34afb733c8056bb1ee4c24
   specs:
     ruby_llm-instrumentation (0.3.0)
       rails (>= 7.2.0)
@@ -301,7 +301,7 @@ GEM
       rubocop-performance (>= 1.24)
       rubocop-rails (>= 2.30)
     ruby-progressbar (1.13.0)
-    ruby_llm (1.13.0)
+    ruby_llm (1.13.1)
       base64
       event_stream_parser (~> 1)
       faraday (>= 2.0)
