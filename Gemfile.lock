@@ -1,6 +1,6 @@
 GIT
   remote: https://github.com/sinaptia/ruby_llm-instrumentation.git
-  revision: 29314e69deba01239b34afb733c8056bb1ee4c24
+  revision: 9ade03debc6bca8cdf993743ffeef387b061c4e2
   specs:
     ruby_llm-instrumentation (0.3.0)
       rails (>= 7.2.0)
@@ -143,7 +143,7 @@ GEM
       prism (>= 1.3.0)
       rdoc (>= 4.0.0)
       reline (>= 0.4.2)
-    json (2.19.0)
+    json (2.19.1)
     json-schema (6.1.0)
       addressable (~> 2.8)
       bigdecimal (>= 3.1, < 5)
