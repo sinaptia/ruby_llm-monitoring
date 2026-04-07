@@ -1,6 +1,6 @@
 GIT
   remote: https://github.com/sinaptia/ruby_llm-instrumentation.git
-  revision: 407d01664a855fe6a64c158ec33363e56885a9e3
+  revision: 43abd28f69ebbd28abfefad209f61cc5676dabb7
   specs:
     ruby_llm-instrumentation (0.3.0)
       rails (>= 7.2.0)
@@ -223,7 +223,7 @@ GEM
     puma (7.2.0)
       nio4r (~> 2.0)
     racc (1.8.1)
-    rack (3.2.5)
+    rack (3.2.6)
     rack-session (2.1.1)
       base64 (>= 0.1.0)
       rack (>= 3.0.0)
