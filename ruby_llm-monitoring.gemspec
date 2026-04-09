@@ -17,7 +17,6 @@ Gem::Specification.new do |spec|
     Dir["{app,config,db,lib}/**/*", "CHANGELOG.md", "MIT-LICENSE", "Rakefile", "README.md"]
   end
 
-  spec.add_dependency "groupdate"
   spec.add_dependency "importmap-rails"
   spec.add_dependency "rails", ">= 7.2.0"
   spec.add_dependency "ruby_llm"
