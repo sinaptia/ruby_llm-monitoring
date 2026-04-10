@@ -20,8 +20,10 @@ module RubyLLM
             "FLOOR(EXTRACT(EPOCH FROM #{column}) / #{interval}) * #{interval}"
           when "Mysql2", "Mysql2Spatial", "Mysql2Rgeo", "Trilogy"
             "FLOOR(UNIX_TIMESTAMP(#{column}) / #{interval}) * #{interval}"
-          else
+          when "SQLite"
             "(strftime('%s', #{column}) / #{interval}) * #{interval}"
+          else
+            raise "Unsupported adapter: #{connection.adapter_name}"
           end
         end
       end
