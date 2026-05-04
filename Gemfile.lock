@@ -1,6 +1,6 @@
 GIT
   remote: https://github.com/sinaptia/ruby_llm-instrumentation.git
-  revision: 20d445de3af5961fb25a6d3af1d296079e7ebbe4
+  revision: 03177a5a1e029daa681ce1a0f59436f94a879e5b
   specs:
     ruby_llm-instrumentation (0.3.1)
       rails (>= 7.2.0)
@@ -113,7 +113,7 @@ GEM
       reline (>= 0.3.8)
     dotenv (3.2.0)
     drb (2.2.3)
-    erb (6.0.2)
+    erb (6.0.4)
     erubi (1.13.1)
     event_stream_parser (1.0.0)
     faraday (2.14.1)
@@ -138,7 +138,7 @@ GEM
       activesupport (>= 6.0.0)
       railties (>= 6.0.0)
     io-console (0.8.2)
-    irb (1.17.0)
+    irb (1.18.0)
       pp (>= 0.6.0)
       prism (>= 1.3.0)
       rdoc (>= 4.0.0)
@@ -163,7 +163,7 @@ GEM
     mcp (0.7.1)
       json-schema (>= 4.1)
     mini_mime (1.1.5)
-    minitest (6.0.4)
+    minitest (6.0.5)
       drb (~> 2.0)
       prism (~> 1.5)
     multipart-post (2.4.1)
@@ -262,7 +262,7 @@ GEM
       tsort (>= 0.2)
       zeitwerk (~> 2.6)
     rainbow (3.1.1)
-    rake (13.3.1)
+    rake (13.4.2)
     rdoc (7.2.0)
       erb
       psych (>= 4.0.0)
