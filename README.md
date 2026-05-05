@@ -250,6 +250,29 @@ RubyLLM::Monitoring.channels = {
 }
 ```
 
+
+## Data retention
+
+RubyLLM::Monitoring records an event for every instrumented LLM call. Those events are kept indefinitely, the engine does not automatically prune them. If you need a retention policy, add it in your application using whatever cadence and storage requirements fit your deployment.
+
+For example, to keep 90 days of monitoring data:
+
+```ruby
+# app/jobs/prune_ruby_llm_monitoring_events_job.rb
+class PruneRubyLLMMonitoringEventsJob < ApplicationJob
+  queue_as :default
+
+  def perform(retention_period = 90.days)
+    RubyLLM::Monitoring::Event
+      .where(created_at: ...retention_period.ago)
+      .in_batches(of: 1_000)
+      .delete_all
+  end
+end
+```
+
+Then schedule the job with your application's scheduler of choice, such as cron, Solid Queue recurring tasks, or GoodJob cron.
+
 ## Contributing
 
 You can open an issue or a PR in GitHub.
