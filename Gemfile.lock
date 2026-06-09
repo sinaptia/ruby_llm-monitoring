@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    ruby_llm-monitoring (0.3.2)
+    ruby_llm-monitoring (0.4.0)
       groupdate
       importmap-rails
       rails (>= 7.2.0)
