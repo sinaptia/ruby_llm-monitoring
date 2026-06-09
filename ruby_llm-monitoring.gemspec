@@ -20,8 +20,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency "groupdate"
   spec.add_dependency "importmap-rails"
   spec.add_dependency "rails", ">= 7.2.0"
-  spec.add_dependency "ruby_llm"
-  spec.add_dependency "ruby_llm-instrumentation", ">= 0.1"
+  spec.add_dependency "ruby_llm", ">= 1.16"
   spec.add_dependency "stimulus-rails"
   spec.add_dependency "turbo-rails"
 end

@@ -1,6 +1,5 @@
 require "groupdate"
 require "ruby_llm"
-require "ruby_llm/instrumentation"
 require "ruby_llm/monitoring/channel_registry"
 require "ruby_llm/monitoring/engine"
 require "ruby_llm/monitoring/version"
