@@ -24,6 +24,3 @@ gem "webmock"
 
 # Start debugger with binding.b [https://github.com/ruby/debug]
 gem "debug", ">= 1.0.0"
-
-# Make sure we're running against the latest ruby_llm-instrumentation
-gem "ruby_llm-instrumentation", github: "sinaptia/ruby_llm-instrumentation"

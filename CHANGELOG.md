@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Changed
+
+- Drop `ruby_llm-instrumentation` dependency in favor of the built-in instrumentation available in `ruby_llm >= 1.16`. [#87](https://github.com/sinaptia/ruby_llm-monitoring/pull/87) [@patriciomacadden](https://github.com/patriciomacadden)
+
 ## [0.3.2] - 2026-04-07
 
 ### Fixed
