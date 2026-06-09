@@ -1,6 +1,7 @@
 module RubyLLM::Monitoring
   class Event < ApplicationRecord
     include Alertable
+    include TimeGrouping
 
     before_validation :set_cost
 
