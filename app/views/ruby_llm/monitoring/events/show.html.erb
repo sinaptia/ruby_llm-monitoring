@@ -18,7 +18,7 @@
     </tr>
     <tr>
       <th>Duration</th>
-      <td><%= @event.duration.round 2 %> ms</td>
+      <td><%= @event.duration.try(:round, 2) %> ms</td>
     </tr>
     <tr>
       <th>Cost</th>
