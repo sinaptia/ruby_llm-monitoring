@@ -70,6 +70,31 @@ module RubyLLM::Monitoring
       assert_equal 0.0, event.cost
     end
 
+    test "uses the nested cost total reported by ruby_llm 2.x" do
+      event = Event.create!(
+        payload: {
+          "provider" => "openrouter",
+          "model" => "xiaomi/mimo-v2.6-flash",
+          "tokens" => { "input" => 337, "output" => 406, "thinking" => 284 },
+          "cost" => { "total" => 0.0002272536 }
+        }
+      )
+
+      assert_equal 0.0002272536, event.cost
+    end
+
+    test "prices nested ruby_llm 2.x tokens against the registry when no cost total is present" do
+      event = Event.create!(
+        payload: {
+          "provider" => "gemini",
+          "model" => "gemini-2.5-flash",
+          "tokens" => { "input" => 1000, "output" => 500 }
+        }
+      )
+
+      assert event.cost > 0.0
+    end
+
     test "calculates cost with missing output_tokens in payload" do
       assert_nothing_raised do
         Event.create!(

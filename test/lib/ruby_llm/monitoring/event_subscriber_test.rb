@@ -33,6 +33,30 @@ module RubyLLM::Monitoring
       assert_equal "ollama", event.payload["provider"]
     end
 
+    test "flattens nested tokens and cost from ruby_llm 2.x payloads" do
+      tokens = RubyLLM::Tokens.new(input: 100, output: 50, thinking: 10)
+      cost = RubyLLM::Cost.new(tokens: tokens, model: RubyLLM.models.find("gemini-2.5-flash"))
+
+      notification_event = ActiveSupport::Notifications::Event.new(
+        "chat.ruby_llm",
+        Time.current,
+        Time.current + 1.second,
+        "transaction-789",
+        { provider: "gemini", model: "gemini-2.5-flash", tokens: tokens, cost: cost }
+      )
+
+      assert_difference "Event.count", 1 do
+        EventSubscriber.new.call(notification_event)
+      end
+
+      event = Event.last
+      assert_equal 100, event.payload["input_tokens"]
+      assert_equal 50, event.payload["output_tokens"]
+      assert_equal 10, event.payload["thinking_tokens"]
+      assert_not_nil event.payload.dig("cost", "total")
+      assert event.cost > 0.0
+    end
+
     test "extracts exception from payload" do
       notification_event = ActiveSupport::Notifications::Event.new(
         "chat.ruby_llm",

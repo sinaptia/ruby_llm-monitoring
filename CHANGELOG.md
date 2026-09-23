@@ -7,8 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- `Event#set_cost` prefers the cost ruby_llm computed (honoring provider-reported pricing, which the registry cannot price for unlisted models) before falling back to registry pricing.
+
 ### Fixed
 
+- Price `chat.ruby_llm` events correctly under ruby_llm >= 2.0, which reports usage as nested `tokens`/`cost` objects instead of top-level `input_tokens`/`output_tokens`. `EventSubscriber` now flattens the nested objects into the payload so the derived `input_tokens`/`output_tokens`/`thinking_tokens` columns stay populated and costs are no longer always `0.0`.
 - Fix cost calculation with RubyLLM 2.x while preserving compatibility with RubyLLM 1.16+. [#102](https://github.com/sinaptia/ruby_llm-monitoring/pull/102) [@patriciomacadden](https://github.com/patriciomacadden)
 
 ## [0.4.0] - 2026-06-09
