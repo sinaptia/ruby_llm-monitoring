@@ -3,6 +3,8 @@ source "https://rubygems.org"
 gemspec path: ".."
 
 gem "rails", "~> 8.0.0"
+# Rails 8.0's JSON encoder passes quirks_mode, which JSON 3 removed.
+gem "json", "< 3"
 
 gem "puma"
 
