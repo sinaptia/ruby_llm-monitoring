@@ -23,7 +23,7 @@ module RubyLLM
           gc_time: event.gc_time,
           idle_time: event.idle_time,
           name: event.name,
-          payload: cleaned_payload(event.payload),
+          payload: normalized_payload(event.payload),
           time: event.time,
           transaction_id: event.transaction_id
         )
@@ -35,20 +35,25 @@ module RubyLLM
       # of top-level `input_tokens`/`output_tokens`. Flatten them so the stored
       # payload — and the SQL virtual columns derived from it — stay queryable
       # and Event#set_cost can price them.
-      def cleaned_payload(raw)
-        payload = raw.except(*FILTERED_PAYLOAD_KEYS)
-        payload.merge!(token_counts(payload.delete(:tokens)))
-        payload[:cost] = cost_breakdown(payload[:cost])
+      def normalized_payload(raw)
+        payload = raw.stringify_keys.except(*FILTERED_PAYLOAD_KEYS.map(&:to_s))
+        payload.merge!(normalized_token_counts(payload.delete("tokens")))
+        payload["cost"] = serialized_cost(payload["cost"])
         payload.compact
       end
 
-      def token_counts(tokens)
-        return {} if tokens.nil? || !tokens.respond_to?(:to_h)
+      def normalized_token_counts(tokens)
+        return {} unless tokens.respond_to?(:to_h)
 
-        tokens.to_h
+        counts = tokens.to_h.stringify_keys
+        %w[input output thinking].each do |name|
+          short = counts.delete(name)
+          counts["#{name}_tokens"] = short if !short.nil? && counts["#{name}_tokens"].nil?
+        end
+        counts
       end
 
-      def cost_breakdown(cost)
+      def serialized_cost(cost)
         return cost if cost.nil? || !cost.respond_to?(:to_h)
 
         cost.to_h

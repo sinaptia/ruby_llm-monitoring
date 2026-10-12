@@ -31,7 +31,7 @@ module RubyLLM::Monitoring
       assert event.cost > 0.0
     end
 
-    test "calculates exact input output and thinking costs" do
+    test "does not charge thinking twice when it is included in output" do
       event = Event.new(payload: {
         "provider" => "gemini",
         "model" => "gemini-2.5-flash",
@@ -45,7 +45,24 @@ module RubyLLM::Monitoring
 
       event.save!
 
-      assert_in_delta (1000 * input_price + 900 * output_price) / 1_000_000.0, event.cost, 1e-12
+      assert_in_delta (1000 * input_price + 500 * output_price) / 1_000_000.0, event.cost, 1e-12
+    end
+
+    test "charges thinking separately when the model has a distinct reasoning price" do
+      original = RubyLLM.models.find("gemini-2.5-flash")
+      model = original.class.new(original.to_h.merge(pricing: {
+        text_tokens: { standard: {
+          input_per_million: 1, output_per_million: 2, reasoning_output_per_million: 3
+        } }
+      }))
+      event = Event.new(payload: {
+        "input_tokens" => 1000, "output_tokens" => 500, "thinking_tokens" => 400
+      })
+      event.define_singleton_method(:find_model) { model }
+
+      event.save!
+
+      assert_in_delta 0.0032, event.cost, 1e-12
     end
 
     test "sets cost to zero for an unknown model" do
@@ -70,12 +87,12 @@ module RubyLLM::Monitoring
       assert_equal 0.0, event.cost
     end
 
-    test "uses the nested cost total reported by ruby_llm 2.x" do
+    test "prefers the computed cost total for an unlisted model" do
       event = Event.create!(
         payload: {
           "provider" => "openrouter",
           "model" => "xiaomi/mimo-v2.6-flash",
-          "tokens" => { "input" => 337, "output" => 406, "thinking" => 284 },
+          "tokens" => RubyLLM::Tokens.new(input: 337, output: 406, thinking: 284).to_h,
           "cost" => { "total" => 0.0002272536 }
         }
       )
@@ -83,12 +100,12 @@ module RubyLLM::Monitoring
       assert_equal 0.0002272536, event.cost
     end
 
-    test "prices nested ruby_llm 2.x tokens against the registry when no cost total is present" do
+    test "prices serialized nested tokens when the computed cost total is missing" do
       event = Event.create!(
         payload: {
           "provider" => "gemini",
           "model" => "gemini-2.5-flash",
-          "tokens" => { "input" => 1000, "output" => 500, "thinking" => 400 },
+          "tokens" => RubyLLM::Tokens.new(input: 1000, output: 500, thinking: 400).to_h,
           "cost" => { "total" => nil }
         }
       )
@@ -96,7 +113,21 @@ module RubyLLM::Monitoring
       input_price = model.respond_to?(:price) ? model.price(:input) : model.input_price_per_million
       output_price = model.respond_to?(:price) ? model.price(:output) : model.output_price_per_million
 
-      assert_in_delta (1000 * input_price + 900 * output_price) / 1_000_000.0, event.cost, 1e-12
+      assert_in_delta (1000 * input_price + 500 * output_price) / 1_000_000.0, event.cost, 1e-12
+    end
+
+    test "accepts short token aliases with string or symbol keys" do
+      [ { input: 1000, output: 500, thinking: 400 },
+        { "input" => 1000, "output" => 500, "thinking" => 400 } ].each do |tokens|
+        event = Event.create!(payload: {
+          model: "gemini-2.5-flash", provider: "gemini", tokens: tokens
+        })
+        expected = RubyLLM::Cost.new(
+          tokens: RubyLLM::Tokens.new(input: 1000, output: 500, thinking: 400),
+          model: event.send(:find_model)
+        ).total
+        assert_in_delta expected, event.cost, 1e-12
+      end
     end
 
     test "calculates cost with missing output_tokens in payload" do

@@ -11,10 +11,10 @@ module RubyLLM::Monitoring
     # OpenRouter catalog entries). Otherwise price the token counts against the
     # registry. Falls back to zero when there is no usage at all.
     def set_cost
-      self.cost = reported_cost || registry_cost || 0.0
+      self.cost = computed_cost_total || registry_cost || 0.0
     end
 
-    def reported_cost
+    def computed_cost_total
       cost = payload_value("cost")
       return nil unless cost.is_a?(Hash)
 
@@ -27,14 +27,14 @@ module RubyLLM::Monitoring
       output = token_number("output_tokens")
       return nil if input.nil? && output.nil?
 
-      model = find_model
-      input_price = model.respond_to?(:price) ? model.price(:input) : model.input_price_per_million
-      output_price = model.respond_to?(:price) ? model.price(:output) : model.output_price_per_million
-      thinking = token_number("thinking_tokens").to_f
-
-      input.to_f / 1_000_000.0 * input_price.to_f +
-        output.to_f / 1_000_000.0 * output_price.to_f +
-        thinking / 1_000_000.0 * output_price.to_f
+      tokens = RubyLLM::Tokens.new(
+        input: input,
+        output: output,
+        thinking: token_number("thinking_tokens")
+      )
+      # RubyLLM handles models that include thinking in output as well as
+      # models that price thinking separately, in both 1.16+ and 2.x.
+      RubyLLM::Cost.new(tokens: tokens, model: find_model).total
     rescue RubyLLM::ModelNotFoundError
       nil
     end
@@ -51,21 +51,21 @@ module RubyLLM::Monitoring
       return nil unless tokens.is_a?(Hash)
 
       short = name.to_s.delete_suffix("_tokens")
-      value = tokens[name] || tokens[name.to_s] || tokens[short] || tokens[short.to_s]
+      value = tokens[name.to_s] || tokens[name.to_sym] || tokens[short] || tokens[short.to_sym]
       value.nil? ? nil : value.to_f
     end
 
     def payload_value(key)
-      payload[key] || payload[key.to_s]
+      payload[key.to_s] || payload[key.to_sym]
     end
 
     def find_model
       registry = RubyLLM.models
       # RubyLLM 2 accepts provider as a keyword; 1.x uses a positional argument.
       if registry.method(:find).parameters.include?([ :key, :provider ])
-        registry.find(payload["model"], provider: payload["provider"])
+        registry.find(payload_value("model"), provider: payload_value("provider"))
       else
-        registry.find(payload["model"], payload["provider"])
+        registry.find(payload_value("model"), payload_value("provider"))
       end
     end
   end

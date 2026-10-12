@@ -33,7 +33,7 @@ module RubyLLM::Monitoring
       assert_equal "ollama", event.payload["provider"]
     end
 
-    test "flattens nested tokens and cost from ruby_llm 2.x payloads" do
+    test "normalizes nested RubyLLM token and cost objects" do
       tokens = RubyLLM::Tokens.new(input: 100, output: 50, thinking: 10)
       cost = RubyLLM::Cost.new(tokens: tokens, model: RubyLLM.models.find("gemini-2.5-flash"))
 
@@ -55,6 +55,51 @@ module RubyLLM::Monitoring
       assert_equal 10, event.payload["thinking_tokens"]
       assert_not_nil event.payload.dig("cost", "total")
       assert event.cost > 0.0
+    end
+
+    test "normalizes string keyed notifications and filters sensitive objects" do
+      tokens = RubyLLM::Tokens.new(input: 100, output: 50, thinking: 10)
+      cost = RubyLLM::Cost.new(tokens: tokens, model: RubyLLM.models.find("gemini-2.5-flash"))
+      raw = {
+        "provider" => "gemini", "model" => "gemini-2.5-flash",
+        "tokens" => tokens, "cost" => cost, "chat" => Object.new
+      }
+      notification = ActiveSupport::Notifications::Event.new(
+        "chat.ruby_llm", Time.current, Time.current + 1.second, "string-keys", raw
+      )
+
+      EventSubscriber.new.call(notification)
+
+      event = Event.last
+      assert_equal 100, event.input_tokens
+      assert_equal 50, event.output_tokens
+      assert_equal 10, event.payload["thinking_tokens"]
+      assert_in_delta cost.total, event.cost, 1e-12
+      assert_equal cost.total, event.payload.dig("cost", "total")
+      assert_not event.payload.key?("chat")
+      assert_same tokens, raw["tokens"]
+    end
+
+    test "normalizes short token aliases with symbol or string keys" do
+      [ { input: 1000, output: 500, thinking: 400 },
+        { "input" => 1000, "output" => 500, "thinking" => 400 } ].each do |tokens|
+        notification = ActiveSupport::Notifications::Event.new(
+          "chat.ruby_llm", Time.current, Time.current + 1.second, "aliases",
+          { provider: "gemini", model: "gemini-2.5-flash", tokens: tokens }
+        )
+
+        EventSubscriber.new.call(notification)
+
+        event = Event.last
+        assert_equal 1000, event.input_tokens
+        assert_equal 500, event.output_tokens
+        assert_equal 400, event.payload["thinking_tokens"]
+        expected = RubyLLM::Cost.new(
+          tokens: RubyLLM::Tokens.new(input: 1000, output: 500, thinking: 400),
+          model: event.send(:find_model)
+        ).total
+        assert_in_delta expected, event.cost, 1e-12
+      end
     end
 
     test "extracts exception from payload" do
