@@ -88,11 +88,15 @@ module RubyLLM::Monitoring
         payload: {
           "provider" => "gemini",
           "model" => "gemini-2.5-flash",
-          "tokens" => { "input" => 1000, "output" => 500 }
+          "tokens" => { "input" => 1000, "output" => 500, "thinking" => 400 },
+          "cost" => { "total" => nil }
         }
       )
+      model = event.send(:find_model)
+      input_price = model.respond_to?(:price) ? model.price(:input) : model.input_price_per_million
+      output_price = model.respond_to?(:price) ? model.price(:output) : model.output_price_per_million
 
-      assert event.cost > 0.0
+      assert_in_delta (1000 * input_price + 900 * output_price) / 1_000_000.0, event.cost, 1e-12
     end
 
     test "calculates cost with missing output_tokens in payload" do
