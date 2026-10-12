@@ -31,6 +31,33 @@ module RubyLLM::Monitoring
       assert event.cost > 0.0
     end
 
+    test "calculates exact input output and thinking costs" do
+      event = Event.new(payload: {
+        "provider" => "gemini",
+        "model" => "gemini-2.5-flash",
+        "input_tokens" => 1000,
+        "output_tokens" => 500,
+        "thinking_tokens" => 400
+      })
+      model = event.send(:find_model)
+      input_price = model.respond_to?(:price) ? model.price(:input) : model.input_price_per_million
+      output_price = model.respond_to?(:price) ? model.price(:output) : model.output_price_per_million
+
+      event.save!
+
+      assert_in_delta (1000 * input_price + 900 * output_price) / 1_000_000.0, event.cost, 1e-12
+    end
+
+    test "sets cost to zero for an unknown model" do
+      event = Event.create!(payload: {
+        "model" => "nonexistent-monitoring-test-model",
+        "input_tokens" => 1000,
+        "output_tokens" => 500
+      })
+
+      assert_equal 0.0, event.cost
+    end
+
     test "sets cost to zero for local provider" do
       event = ruby_llm_monitoring_events(:ollama_recent)
 
