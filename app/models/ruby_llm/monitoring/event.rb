@@ -6,29 +6,66 @@ module RubyLLM::Monitoring
 
     private
 
+    # Prefer the cost ruby_llm already computed — it honors provider-reported
+    # pricing, which the local registry cannot price for unlisted models (e.g.
+    # OpenRouter catalog entries). Otherwise price the token counts against the
+    # registry. Falls back to zero when there is no usage at all.
     def set_cost
-      return self.cost = 0.0 if [ payload["input_tokens"], payload["output_tokens"] ].all?(nil)
+      self.cost = computed_cost_total || registry_cost || 0.0
+    end
 
-      model = find_model
-      input_price = model.respond_to?(:price) ? model.price(:input) : model.input_price_per_million
-      output_price = model.respond_to?(:price) ? model.price(:output) : model.output_price_per_million
+    def computed_cost_total
+      cost = payload_value("cost")
+      return nil unless cost.is_a?(Hash)
 
-      input_cost = payload["input_tokens"].to_f / 1_000_000.0 * input_price.to_f
-      output_cost = payload["output_tokens"].to_f / 1_000_000.0 * output_price.to_f
-      thinking_cost = payload["thinking_tokens"].to_f / 1_000_000.0 * output_price.to_f
+      total = cost["total"] || cost[:total]
+      total.to_f if total
+    end
 
-      self.cost = input_cost + output_cost + thinking_cost
+    def registry_cost
+      input = token_number("input_tokens")
+      output = token_number("output_tokens")
+      return nil if input.nil? && output.nil?
+
+      tokens = RubyLLM::Tokens.new(
+        input: input,
+        output: output,
+        thinking: token_number("thinking_tokens")
+      )
+      # RubyLLM handles models that include thinking in output as well as
+      # models that price thinking separately, in both 1.16+ and 2.x.
+      RubyLLM::Cost.new(tokens: tokens, model: find_model).total
     rescue RubyLLM::ModelNotFoundError
-      self.cost = 0.0
+      nil
+    end
+
+    # Reads a token count from the flattened payload (ruby_llm <= 1.x and the
+    # normalized EventSubscriber payload) or from the nested `tokens` object
+    # (ruby_llm >= 2.x), accepting either the long (`input_tokens`) or short
+    # (`input`) key.
+    def token_number(name)
+      direct = payload_value(name)
+      return direct.to_f unless direct.nil?
+
+      tokens = payload_value("tokens")
+      return nil unless tokens.is_a?(Hash)
+
+      short = name.to_s.delete_suffix("_tokens")
+      value = tokens[name.to_s] || tokens[name.to_sym] || tokens[short] || tokens[short.to_sym]
+      value.nil? ? nil : value.to_f
+    end
+
+    def payload_value(key)
+      payload[key.to_s] || payload[key.to_sym]
     end
 
     def find_model
       registry = RubyLLM.models
       # RubyLLM 2 accepts provider as a keyword; 1.x uses a positional argument.
       if registry.method(:find).parameters.include?([ :key, :provider ])
-        registry.find(payload["model"], provider: payload["provider"])
+        registry.find(payload_value("model"), provider: payload_value("provider"))
       else
-        registry.find(payload["model"], payload["provider"])
+        registry.find(payload_value("model"), payload_value("provider"))
       end
     end
   end
