@@ -312,7 +312,7 @@ GEM
       railties (>= 6.0.0)
     thor (1.5.0)
     timeout (0.6.1)
-    trilogy (2.13.1)
+    trilogy (2.13.3)
       bigdecimal
     tsort (0.2.0)
     turbo-rails (2.0.23)
