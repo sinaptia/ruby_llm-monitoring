@@ -288,7 +288,7 @@ GEM
       rubocop-performance (>= 1.24)
       rubocop-rails (>= 2.30)
     ruby-progressbar (1.13.0)
-    ruby_llm (2.2.2)
+    ruby_llm (2.2.3)
       base64
       faraday (>= 1.10.0, != 2.0.0)
       faraday-multipart (>= 1)
